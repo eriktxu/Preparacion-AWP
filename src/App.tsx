@@ -25,7 +25,7 @@ function App() {
           onChange={(e) => setTexto(e.target.value)}
           placeholder="Escribe una nota..."
         />
-        <button onClick={agregarNota}>Agregar</button>
+        <button onClick={agregarNota}>Agregar nota</button>
 
         <ul>
           {notas.map((n, i) => (
