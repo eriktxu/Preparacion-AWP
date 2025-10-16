@@ -13,3 +13,16 @@ if ("serviceWorker" in navigator) {
       .catch((err) => console.log("Error al registrar SW:", err));
   });
 }
+
+if ("Notification" in window && "serviceWorker" in navigator) {
+  Notification.requestPermission().then((result) => {
+    if (result === "granted") {
+      navigator.serviceWorker.ready.then((reg) => {
+        reg.showNotification("¡Notificación de prueba!", {
+          body: "Esto es una prueba local de notificación push",
+          icon: "/icons/icon-192.png",
+        });
+      });
+    }
+  });
+}
