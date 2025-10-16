@@ -59,3 +59,40 @@ self.addEventListener("fetch", (event) => {
     })
   );
 });
+
+
+const OFFLINE_URL = "/offline.html";
+
+self.addEventListener("install", (event) => {
+  event.waitUntil(
+    caches.open(CACHE_NAME).then((cache) => cache.addAll([...urlsToCache, OFFLINE_URL]))
+  );
+});
+
+self.addEventListener("fetch", (event) => {
+  event.respondWith(
+    fetch(event.request).catch(() => caches.match(OFFLINE_URL))
+  );
+});
+
+self.addEventListener("sync", (event) => {
+  if (event.tag === "sync-notas") {
+    event.waitUntil(syncNotas());
+  }
+});
+
+async function syncNotas() {
+  const db = await new Promise((resolve, reject) => {
+    const request = indexedDB.open("NotasDB", 1);
+    request.onsuccess = () => resolve(request.result);
+    request.onerror = () => reject(request.error);
+  });
+
+  const tx = db.transaction("notas", "readonly");
+  const notas = await tx.objectStore("notas").getAll();
+
+  console.log("Simulando envío al servidor:", notas);
+
+  const txClear = db.transaction("notas", "readwrite");
+  txClear.objectStore("notas").clear();
+}
